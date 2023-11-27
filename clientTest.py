@@ -74,5 +74,6 @@ class ClientApp:
 
 if __name__ == "__main__":
     root = tk.Tk()
+    root.config(padx=20,pady=10)
     app = ClientApp(root)
     root.mainloop()
