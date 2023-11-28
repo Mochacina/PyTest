@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import ttk, scrolledtext
 import socket
 import threading
+import webbrowser
 
 class ClientApp:
     def __init__(self, root):
@@ -37,6 +38,7 @@ class ClientApp:
         self.server_ip = ""
         self.port = 0
         self.client_socket = None
+        self.client_socket_timeout = 5
         self.connected = False
         self.new_window = None
 
@@ -52,6 +54,7 @@ class ClientApp:
 
         try:
             self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.client_socket.settimeout(self.client_socket_timeout)
             self.client_socket.connect((self.server_ip, self.port))
             self.connected = True
             self.connect_button.config(text="연결 해제")
@@ -65,6 +68,10 @@ class ClientApp:
 
             # 서버로부터 수신한 데이터를 처리할 쓰레드 시작
             threading.Thread(target=self.receive_data).start()
+        
+        except socket.timeout:
+            print(f"연결 시간 초과: {e}")
+        
         except Exception as e:
             print(f"연결 오류: {e}")
 
