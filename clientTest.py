@@ -9,30 +9,34 @@ class ClientApp:
         self.root = root
         self.root.title("Socket Client")
 
+        # 에러메세지용 라벨
+        self.warning_label = ttk.Label(root, text="서버 IP와 포트를 입력하고 연결하세요", anchor="center")
+        self.warning_label.grid(row=0, column=0, columnspan=2, pady=10, sticky=tk.W)
+
         # 서버 IP와 포트 입력
         self.server_ip_label = ttk.Label(root, text="서버 IP:")
-        self.server_ip_label.grid(row=0, column=0, sticky=tk.W)
+        self.server_ip_label.grid(row=1, column=0, sticky=tk.W)
         self.server_ip_entry = ttk.Entry(root)
-        self.server_ip_entry.grid(row=0, column=1, pady=5)
+        self.server_ip_entry.grid(row=1, column=1, pady=5)
 
         self.port_label = ttk.Label(root, text="포트:")
-        self.port_label.grid(row=1, column=0, sticky=tk.W)
+        self.port_label.grid(row=2, column=0, sticky=tk.W)
         self.port_entry = ttk.Entry(root)
-        self.port_entry.grid(row=1, column=1, pady=5)
+        self.port_entry.grid(row=2, column=1, pady=5)
 
         # 연결/연결 해제 버튼
         self.connect_button = ttk.Button(root, text="연결", command=self.toggle_connection)
-        self.connect_button.grid(row=2, column=0, columnspan=2, pady=10)
+        self.connect_button.grid(row=3, column=0, columnspan=2, pady=10)
 
         # 데이터 입력란
         self.input_text_label = ttk.Label(root, text="데이터 입력:")
-        self.input_text_label.grid(row=3, column=0, sticky=tk.W)
+        self.input_text_label.grid(row=4, column=0, sticky=tk.W)
         self.input_text_entry = ttk.Entry(root)
-        self.input_text_entry.grid(row=3, column=1, pady=5)
+        self.input_text_entry.grid(row=4, column=1, pady=5)
 
         # 데이터 전송 버튼
         self.send_button = ttk.Button(root, text="데이터 전송", command=self.send_data, state=tk.DISABLED)
-        self.send_button.grid(row=4, column=0, columnspan=2, pady=10)
+        self.send_button.grid(row=5, column=0, columnspan=2, pady=10)
 
         # 소켓 관련 변수 초기화
         self.server_ip = ""
@@ -69,10 +73,12 @@ class ClientApp:
             # 서버로부터 수신한 데이터를 처리할 쓰레드 시작
             threading.Thread(target=self.receive_data).start()
         
-        except socket.timeout:
+        except socket.timeout as e:
+            self.warning_label.config(text=f"연결 시간 초과: {e}")
             print(f"연결 시간 초과: {e}")
         
         except Exception as e:
+            self.warning_label.config(text=f"연결 오류: {e}")
             print(f"연결 오류: {e}")
 
     def disconnect(self):
