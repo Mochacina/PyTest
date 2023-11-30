@@ -92,7 +92,7 @@ class ClientApp:
     def send_data(self):
         data = self.input_text_entry.get()
         try:
-            self.client_socket.send(data.encode())
+            if len(data)>0: self.client_socket.send(data.encode())
         except Exception as e:
             print(f"데이터 전송 오류: {e}")
             
@@ -100,14 +100,16 @@ class ClientApp:
         while self.connected:
             try:
                 data = self.client_socket.recv(1024).decode()
-                if not data:
-                    break
                 # 서버로부터 수신한 데이터를 새로운 창에 추가
-                if self.new_window:
+                if data and self.new_window:
                     self.add_received_data(f"받은 데이터: {data}")
-            except Exception as e:
-                print(f"데이터 수신 오류: {e}")
-                break
+                elif not data:
+                    self.disconnect()
+                    return 0
+            except TimeoutError as e: pass
+            except Exception as e2:
+                print(f"데이터 수신 오류: {e2}")
+                pass
             
     def create_new_window(self):
         # 수신된 데이터를 표시할 새로운 창 생성
