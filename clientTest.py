@@ -82,9 +82,9 @@ class ClientApp:
             print(f"연결 오류: {e}")
 
     def disconnect(self):
+        self.connected = False
         if self.client_socket:
             self.client_socket.close()
-        self.connected = False
         self.connect_button.config(text="연결")
         self.send_button.config(state=tk.DISABLED)
         self.close_new_window()
