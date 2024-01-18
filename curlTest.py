@@ -1,15 +1,15 @@
 import requests
+import json
 
 def get_request(url):
-    # GET ¿äÃ» º¸³»±â
+    # GET ìš”ì²­ ë³´ë‚´ê¸°
     response = requests.get(url)
     print("GET Response:")
     print(response.text)
 
 def post_request(url, data):
-    # POST ¿äÃ» º¸³»±â (JSON µ¥ÀÌÅÍ Àü¼Û ¿¹Á¦)
-    payload = {"key1": "value1", "key2": "value2"}
-    response = requests.post(url, json=payload)
+    # POST ìš”ì²­ ë³´ë‚´ê¸° (JSON ë°ì´í„° ì „ì†¡ ì˜ˆì œ)
+    response = requests.post(url, json=data) # payload = {key1: value1, key2: value2}
     print("\nPOST Response:")
     print(response.text)
 
@@ -17,12 +17,22 @@ if __name__ == "__main__":
     while 1:
         types = ["get","post"]
         
-        url = input("Request URLÀ» ÀÔ·ÂÇÏ½Ê½Ã¿À: ")
-        type = input("Request TypeÀ» ÀÔ·ÂÇÏ½Ê½Ã¿À(get/post): ")
-        count = int(input("¹İº¹ È½¼ö¸¦ ÀÔ·ÂÇÏ½Ê½Ã¿À: "))
+        url = input("Request URLì„ ì…ë ¥í•˜ì‹­ì‹œì˜¤: ")
+        type = input("Request Typeì„ ì…ë ¥í•˜ì‹­ì‹œì˜¤(get/post): ")
+        count = int(input("ë°˜ë³µ íšŸìˆ˜ë¥¼ ì…ë ¥í•˜ì‹­ì‹œì˜¤: "))
         
         if not type in types:
-            print("¿Ã¹Ù¸£Áö ¾ÊÀº Request TypeÀ» ÀÔ·ÂÇß½À´Ï´Ù.")
+            print("ì˜¬ë°”ë¥´ì§€ ì•Šì€ Request Typeì„ ì…ë ¥í–ˆìŠµë‹ˆë‹¤.")
+            continue
         
-    
-    
+        if type == "post":
+            json_string = input("Post Type ìš”ì²­ì˜ dataë¥¼ ì…ë ¥í•˜ì‹­ì‹œì˜¤:\n")
+            json_data = json.loads(json_string)
+        
+        for _ in range(count):
+            if type == "get": get_request(url)
+            if type == "post": post_request(url,json_data)
+            
+        exit()
+        
+# http://httpbin.org/post
