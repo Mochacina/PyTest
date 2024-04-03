@@ -6,6 +6,9 @@ import webbrowser
 
 class ClientApp:
     def __init__(self, root):
+        self.threads = []
+        self.lock = threading.Lock()
+        
         self.root = root
         self.root.title("Socket Client")
 
@@ -23,20 +26,25 @@ class ClientApp:
         self.port_label.grid(row=2, column=0, sticky=tk.W)
         self.port_entry = ttk.Entry(root)
         self.port_entry.grid(row=2, column=1, pady=5)
+        
+        self.thread_label = ttk.Label(root, text="Thread Num:")
+        self.thread_label.grid(row=3, column=0, sticky=tk.W)
+        self.thread_entry = ttk.Entry(root)
+        self.thread_entry.grid(row=3, column=1, pady=5)
 
         # 연결/연결 해제 버튼
         self.connect_button = ttk.Button(root, text="연결", command=self.toggle_connection)
-        self.connect_button.grid(row=3, column=0, columnspan=2, pady=10)
+        self.connect_button.grid(row=4, column=0, columnspan=2, pady=10)
 
         # 데이터 입력란
         self.input_text_label = ttk.Label(root, text="데이터 입력:")
-        self.input_text_label.grid(row=4, column=0, sticky=tk.W)
+        self.input_text_label.grid(row=5, column=0, sticky=tk.W)
         self.input_text_entry = ttk.Entry(root)
-        self.input_text_entry.grid(row=4, column=1, pady=5)
+        self.input_text_entry.grid(row=5, column=1, pady=5)
 
         # 데이터 전송 버튼
         self.send_button = ttk.Button(root, text="데이터 전송", command=self.send_data, state=tk.DISABLED)
-        self.send_button.grid(row=5, column=0, columnspan=2, pady=10)
+        self.send_button.grid(row=6, column=0, columnspan=2, pady=10)
 
         # 소켓 관련 변수 초기화
         self.server_ip = ""
@@ -91,10 +99,23 @@ class ClientApp:
 
     def send_data(self):
         data = self.input_text_entry.get()
-        try:
-            if len(data)>0: self.client_socket.send(data.encode())
-        except Exception as e:
-            print(f"데이터 전송 오류: {e}")
+        threadNum = int(self.thread_entry.get())
+        
+        def send_message(content):
+            with self.lock:
+                try:
+                    if len(content)>0: self.client_socket.send(content.encode())
+                except Exception as e:
+                    print(f"데이터 전송 오류: {e}")
+                finally:
+                    self.add_received_data(f"보낸 데이터: {content}")
+                    if threading.current_thread() in self.threads:
+                        self.threads.remove(threading.current_thread())
+                
+        for i in range(threadNum):
+            t = threading.Thread(target=send_message, args=(data,))
+            self.threads.append(t) # self.threads는 init에서 초기화한 리스트
+            t.start()
             
     def receive_data(self):
         while self.connected:
