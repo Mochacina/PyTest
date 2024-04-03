@@ -58,7 +58,10 @@ class ClientApp:
         if self.connected:
             self.disconnect()
         else:
-            self.connect()
+            if (len(self.server_ip_entry.get()) and len(self.port_entry.get()) and len(self.thread_entry.get())) == 0:
+                self.warning_label.config(text="서버 IP, 포트, Thread Num을 입력해주세요.")
+                return
+            else: self.connect()
 
     def connect(self):
         self.server_ip = self.server_ip_entry.get()
