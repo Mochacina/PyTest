@@ -1,8 +1,8 @@
 print("Hello!")
 
 def test(l):
-    for n in range(len(l)):
-        l[n] = n
+    for n, i in enumerate(l):
+        i = n
     print(l)
 
 if __name__ == "__main__":
